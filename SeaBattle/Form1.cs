@@ -16,7 +16,7 @@ namespace SeaBattle
         int[] ships = new int[10] { 4, 3, 3, 2, 2, 2, 1, 1, 1, 1 };
         int count = 0;
         int[,] player_field = new int[10, 10];
-        PictureBox[,] pictures = new PictureBox[10, 10];
+        PictureBox[,] field_player_pictures = new PictureBox[10, 10];
         public Form1()
         {
             InitializeComponent();
@@ -43,24 +43,24 @@ namespace SeaBattle
             {
                 for (int j = 0; j < 10; j++)
                 {
-                    pictures[i, j] = new PictureBox();
-                    pictures[i, j].Left = loc_x;
-                    pictures[i, j].Top = loc_y;
-                    pictures[i, j].Width = 50;
-                    pictures[i, j].Height = 50;
-                    pictures[i, j].Image = Properties.Resources.template;
-                    pictures[i, j].Name = "PictureBox" + i.ToString() + j.ToString();
-                    pictures[i, j].Tag = "empty";
+                    field_player_pictures[i, j] = new PictureBox();
+                    field_player_pictures[i, j].Left = loc_x;
+                    field_player_pictures[i, j].Top = loc_y;
+                    field_player_pictures[i, j].Width = 50;
+                    field_player_pictures[i, j].Height = 50;
+                    field_player_pictures[i, j].Image = Properties.Resources.template;
+                    field_player_pictures[i, j].Name = "PictureBox" + i.ToString() + j.ToString();
+                    field_player_pictures[i, j].Tag = "empty";
                     if (playerField) 
                     {
-                        pictures[i, j].Click += SetShips;
+                        field_player_pictures[i, j].Click += SetShips;
                     }
                     else {
-                        pictures[i, j].Click += ShootShips;
+                        field_player_pictures[i, j].Click += ShootShips;
                     }
-                    pictures[i, j].SizeMode = PictureBoxSizeMode.Zoom;
-                    pictures[i, j] = pictures[i, j];
-                    this.Controls.Add(pictures[i, j]);
+                    field_player_pictures[i, j].SizeMode = PictureBoxSizeMode.Zoom;
+                    field_player_pictures[i, j] = field_player_pictures[i, j];
+                    this.Controls.Add(field_player_pictures[i, j]);
 
                     loc_x += 55;
                 }
@@ -68,16 +68,7 @@ namespace SeaBattle
                 loc_x = playerField ? 120 : 700;
             }
 
-            if (playerField)
-            {
-                playerPictures = pictures;
-                playerFieldState = field;
-            }
-            else
-            {
-                computerPictures = pictures;
-                computerFieldState = field;
-            }
+  
         }
 
         private void SetShips(object sender, EventArgs e)
