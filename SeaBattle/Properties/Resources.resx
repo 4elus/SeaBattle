@@ -124,4 +124,7 @@
   <data name="shipset" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\shipset.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="posship" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\posship1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

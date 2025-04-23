@@ -63,6 +63,16 @@ namespace SeaBattle.Properties {
         /// <summary>
         ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap posship {
+            get {
+                object obj = ResourceManager.GetObject("posship", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Поиск локализованного ресурса типа System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap shipset {
             get {
                 object obj = ResourceManager.GetObject("shipset", resourceCulture);
