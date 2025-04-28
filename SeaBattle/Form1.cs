@@ -15,9 +15,11 @@ namespace SeaBattle
         int[] ships = new int[10] { 4, 3, 3, 2, 2, 2, 1, 1, 1, 1 };
         int count = 0;
         int[,] player_field = new int[10, 10];
+        int[,] computer_field = new int[10, 10];
         PictureBox[,] field_player_pictures = new PictureBox[10, 10];
-        PictureBox[,] field_computer_pictures = new PictureBox[10, 10]; 
-        bool dir = false; // false - гор, true - верт
+        PictureBox[,] field_computer_pictures = new PictureBox[10, 10];
+        bool dir = false; // false - горизонтально, true - вертикально
+        Random random = new Random();
         public Form1()
         {
             InitializeComponent();
@@ -27,6 +29,7 @@ namespace SeaBattle
         {
             CreateGameField(playerField: true);
             CreateGameField(playerField: false);
+           
         }
 
         private void CreateGameField(bool playerField)
@@ -53,8 +56,8 @@ namespace SeaBattle
                     if (playerField)
                     {
                         pic.Click += SetShips;
-                        pic.MouseHover += Picturebox_MouseHover;
-                        pic.MouseLeave += Picturebox_MouseEnd;
+                        pic.MouseHover += PictureBox_MouseHover;
+                        pic.MouseLeave += PictureBox_MouseEnd;
                         field_player_pictures[i, j] = pic;
                     }
                     else
@@ -62,9 +65,7 @@ namespace SeaBattle
                         pic.Click += ShootShips;
                         field_computer_pictures[i, j] = pic;
                     }
-                       
 
-                   
                     this.Controls.Add(pic);
 
                     loc_x += 55;
@@ -87,7 +88,8 @@ namespace SeaBattle
             int col = Convert.ToInt32(picture.Name[11].ToString());
             int shipLength = ships[count];
 
-            if (col + shipLength > 10)
+            // Проверка на выход за границы
+            if ((dir && row + shipLength > 10) || (!dir && col + shipLength > 10))
             {
                 MessageBox.Show("Корабль выходит за границы поля.");
                 return;
@@ -96,7 +98,10 @@ namespace SeaBattle
             // Проверка на пересечения
             for (int i = 0; i < shipLength; i++)
             {
-                if (player_field[row, col + i] == 1)
+                int r = dir ? row + i : row;
+                int c = dir ? col : col + i;
+
+                if (player_field[r, c] == 1)
                 {
                     MessageBox.Show("На этом месте уже есть корабль.");
                     return;
@@ -106,9 +111,12 @@ namespace SeaBattle
             // Установка корабля
             for (int i = 0; i < shipLength; i++)
             {
-                player_field[row, col + i] = 1;
-                field_player_pictures[row, col + i].Image = Properties.Resources.shipset; 
-                field_player_pictures[row, col + i].Tag = "ship";
+                int r = dir ? row + i : row;
+                int c = dir ? col : col + i;
+
+                player_field[r, c] = 1;
+                field_player_pictures[r, c].Image = Properties.Resources.shipset;
+                field_player_pictures[r, c].Tag = "ship";
             }
 
             count++;
@@ -119,37 +127,135 @@ namespace SeaBattle
             MessageBox.Show("Выстрел произведён!");
         }
 
-        private void Picturebox_MouseHover(object sender, EventArgs e)
+        private void PictureBox_MouseHover(object sender, EventArgs e)
         {
-            PictureBox picture = sender as PictureBox;
-            int row = Convert.ToInt32(picture.Name[10].ToString());
-            int col = Convert.ToInt32(picture.Name[11].ToString());
-
-            if (field_player_pictures[row, col].Tag.ToString() != "ship")
+            if (count < 10)
             {
-                field_player_pictures[row, col].Image = Properties.Resources.posship;
-            }  
+                PictureBox picture = sender as PictureBox;
+                int row = Convert.ToInt32(picture.Name[10].ToString());
+                int col = Convert.ToInt32(picture.Name[11].ToString());
+                int shipLength = ships[count];
+
+                // Проверка на выход за границы
+                if ((dir && row + shipLength > 10) || (!dir && col + shipLength > 10))
+                    return;
+
+                // Окрашивание клеток
+                for (int i = 0; i < shipLength; i++)
+                {
+                    int r = dir ? row + i : row;
+                    int c = dir ? col : col + i;
+
+                    if (field_player_pictures[r, c].Tag.ToString() != "ship")
+                    {
+                        field_player_pictures[r, c].Image = Properties.Resources.shipset;
+                    }
+                }
+            }
         }
-        private void Picturebox_MouseEnd(object sender, EventArgs e)
+
+        private void PictureBox_MouseEnd(object sender, EventArgs e)
         {
-
-            PictureBox picture = sender as PictureBox;
-            int row = Convert.ToInt32(picture.Name[10].ToString());
-            int col = Convert.ToInt32(picture.Name[11].ToString());
-
-            if (field_player_pictures[row, col].Tag.ToString() != "ship")
+            if (count < 10)
             {
-                field_player_pictures[row, col].Image = Properties.Resources.template;
+                PictureBox picture = sender as PictureBox;
+                int row = Convert.ToInt32(picture.Name[10].ToString());
+                int col = Convert.ToInt32(picture.Name[11].ToString());
+                int shipLength = ships[count];
+
+                // Проверка на выход за границы
+                if ((dir && row + shipLength > 10) || (!dir && col + shipLength > 10))
+                    return;
+
+                // Сброс окрашивания клеток
+                for (int i = 0; i < shipLength; i++)
+                {
+                    int r = dir ? row + i : row;
+                    int c = dir ? col : col + i;
+
+                    if (field_player_pictures[r, c].Tag.ToString() != "ship")
+                    {
+                        field_player_pictures[r, c].Image = Properties.Resources.template;
+                    }
+                }
             }
         }
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.E) 
+            if (e.KeyCode == Keys.E)
             {
-                dir = !dir;
-                MessageBox.Show(dir.ToString());
+                dir = !dir; // Переключение направления
+                
             }
+
+            for (int i = 0; i < field_player_pictures.GetUpperBound(0)+1; i++)
+            {
+                for (int j = 0; j < field_player_pictures.GetUpperBound(0)+1; j++)
+                {
+                    if (field_player_pictures[i, j].Tag.ToString() != "ship")
+                    {
+                        field_player_pictures[i, j].Image = Properties.Resources.template;
+                    }
+                }
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            int count_pc = 0;
+
+            while (count_pc < 10)
+            {
+                bool out_of_border = false;
+                bool is_empty = false;
+                int row = random.Next(0, 10);
+                int col = random.Next(0, 10);
+                int random_dir = random.Next(0, 2); // 0 - гор ; 1 - верт
+                bool dir = random_dir == 1 ? true : false;
+                MessageBox.Show(row + " : " + col);
+
+                // проверка выхода за границу поля и проверка на пустые клетки
+                int shipLength = ships[count_pc];
+
+                // Проверка на выход за границы
+                if ((dir && row + shipLength > 10) || (!dir && col + shipLength > 10))
+                {
+                    MessageBox.Show("Корабль выходит за границы поля.");
+                    out_of_border = true;
+                }
+
+                // Проверка на пересечения
+                for (int i = 0; i < shipLength; i++)
+                {
+                    int r = dir ? row + i : row;
+                    int c = dir ? col : col + i;
+
+                    if (computer_field[r, c] == 1)
+                    {
+                        MessageBox.Show("На этом месте уже есть корабль.");
+                        is_empty = true;
+                    }
+                }
+
+                // Установка корабля
+                for (int i = 0; i < shipLength; i++)
+                {
+                    int r = dir ? row + i : row;
+                    int c = dir ? col : col + i;
+
+                    computer_field[r, c] = 1;
+                    field_computer_pictures[r, c].Image = Properties.Resources.shipset;
+                    field_computer_pictures[r, c].Tag = "ship";
+                }
+               if (out_of_border == false && is_empty == false)
+                {
+                    count_pc++;
+                }
+
+            }
+
+            MessageBox.Show("Компьютер готов!");
         }
     }
 }
